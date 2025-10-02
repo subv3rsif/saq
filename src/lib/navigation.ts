@@ -31,16 +31,13 @@ export class NavigationService {
   }
 
   async loadArtworks(): Promise<void> {
-    try {
-      const response = await fetch(`${this.baseUrl}/api/artworks?loop=${this.currentLoop}`);
-      const data: ArtworksResponse = await response.json();
-      
-      if (data.success) {
-        this.artworks = data.artworks;
-      }
-    } catch (error) {
-      console.error('Erreur chargement artworks:', error);
-      throw error;
+    const response = await fetch(`${this.baseUrl}/api/artworks?loop=${this.currentLoop}`);
+    const data: ArtworksResponse = await response.json();
+    
+    if (data.success) {
+      this.artworks = data.artworks;
+    } else {
+      throw new Error('Erreur chargement artworks');
     }
   }
 
@@ -52,22 +49,12 @@ export class NavigationService {
     return this.artworks[currentIndex + 1];
   }
 
-  getPreviousArtwork(currentArtworkId: number): Artwork | null {
-    const currentIndex = this.artworks.findIndex(a => a.id === currentArtworkId);
-    if (currentIndex <= 0) return null;
-    return this.artworks[currentIndex - 1];
-  }
-
-  getProgress(currentArtworkId: number): { current: number; total: number; percentage: number } {
+  getProgress(currentArtworkId: number) {
     const currentIndex = this.artworks.findIndex(a => a.id === currentArtworkId);
     return {
       current: currentIndex + 1,
       total: this.artworks.length,
       percentage: Math.round(((currentIndex + 1) / this.artworks.length) * 100)
     };
-  }
-
-  getAllArtworks(): Artwork[] {
-    return this.artworks;
   }
 }
